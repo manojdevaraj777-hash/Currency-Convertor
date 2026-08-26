@@ -425,9 +425,7 @@ input[type="number"]:focus {
 #result-main {
     font-size: 28px;
     font-weight: 700;
-    background: linear-gradient(to right, #fff, #93c5fd);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -435,8 +433,13 @@ input[type="number"]:focus {
     flex-wrap: wrap;
 }
 
+#result-main strong {
+    color: #60a5fa;
+    font-size: 32px;
+}
+
 .result-arrow {
-    -webkit-text-fill-color: var(--text-secondary);
+    color: #9ca3af;
     font-size: 22px;
     margin: 0 4px;
 }
