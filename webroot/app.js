@@ -55,6 +55,18 @@ const amountInput = $("amount");
 const resultBox = $("result");
 const errorBox = $("error");
 
+function showError(msg) {
+    errorBox.textContent = msg;
+    errorBox.classList.remove("hidden");
+    resultBox.classList.add("hidden");
+}
+
+function hideError() {
+    errorBox.textContent = "";
+    errorBox.classList.add("hidden");
+    resultBox.classList.remove("hidden");
+}
+
 // Custom Seeded Pseudo-Random Number Generator for consistent offline charts
 function createRandom(seed) {
     let s = seed;
