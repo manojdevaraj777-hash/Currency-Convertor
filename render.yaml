@@ -1,11 +1,7 @@
 services:
   - type: web
     name: currency-converter
-    runtime: java
-    buildCommand: mvn package -DskipTests
-    startCommand: java -jar target/currency-converter-1.0.jar
+    env: docker
     envVars:
-      - key: JAVA_VERSION
-        value: "17"
       - key: MONGODB_URI
         sync: false

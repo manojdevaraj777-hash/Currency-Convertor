@@ -1,15 +1,13 @@
-# Build stage
-FROM openjdk:17-slim AS build
+FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
-COPY src/ /app/src/
-COPY lib/ /app/lib/
-RUN mkdir -p out && javac -encoding UTF-8 -cp "lib/*" -d out src/com/currencyconverter/model/Currency.java src/com/currencyconverter/service/*.java src/com/currencyconverter/web/CurrencyWebServer.java
+COPY pom.xml .
+RUN mvn dependency:go-offline -q
+COPY src ./src
+RUN mvn package -DskipTests -q
 
-# Run stage
-FROM openjdk:17-slim
+FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
-COPY --from=build /app/out /app/out
-COPY --from=build /app/lib /app/lib
-COPY webroot/ /app/webroot/
+COPY --from=build /app/target/currency-converter-1.0.jar app.jar
+COPY webroot ./webroot
 EXPOSE 8080
-CMD ["java", "-cp", "out:lib/*", "com.currencyconverter.web.CurrencyWebServer"]
+CMD ["java", "-jar", "app.jar"]
