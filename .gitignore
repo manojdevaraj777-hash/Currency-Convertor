@@ -1,0 +1,10 @@
+out/
+target/
+*.class
+rates-cache.txt
+calculator-history.jsonl
+currency-history.jsonl
+lib/
+.idea/
+*.iml
+.DS_Store
