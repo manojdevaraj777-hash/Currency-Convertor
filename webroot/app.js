@@ -221,8 +221,7 @@ async function convert() {
         }
 
         hideError();
-        resultBox.classList.remove("hidden");
-        
+
         // Draw country flags in the result section using images
         const toCountry = data.toCountry || "in";
         const fromCountry = data.fromCountry || "us";
