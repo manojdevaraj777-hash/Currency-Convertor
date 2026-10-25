@@ -34,15 +34,18 @@ public class CurrencyWebServer {
     private final ExchangeRateProvider rateProvider;
     private final String sourceDescription;
     private final ConversionHistoryStore historyStore;
+    private final GeminiChatService chatService;
 
     public CurrencyWebServer(CurrencyConverterService converterService,
                              ExchangeRateProvider rateProvider,
                              String sourceDescription,
-                             ConversionHistoryStore historyStore) {
+                             ConversionHistoryStore historyStore,
+                             GeminiChatService chatService) {
         this.converterService = converterService;
         this.rateProvider = rateProvider;
         this.sourceDescription = sourceDescription;
         this.historyStore = historyStore;
+        this.chatService = chatService;
     }
 
     public static void main(String[] args) throws IOException {
@@ -80,8 +83,10 @@ public class CurrencyWebServer {
             historyStore = new FileConversionHistoryStore();
         }
 
+        GeminiChatService chatService = new GeminiChatService();
+
         CurrencyWebServer app =
-                new CurrencyWebServer(service, rateProvider, rateProvider.getSourceDescription(), historyStore);
+                new CurrencyWebServer(service, rateProvider, rateProvider.getSourceDescription(), historyStore, chatService);
 
         HttpServer server;
         try {
@@ -98,6 +103,7 @@ public class CurrencyWebServer {
         server.createContext("/api/convert", app::handleConvert);
         server.createContext("/api/currencies", app::handleCurrencies);
         server.createContext("/api/history", app::handleHistory);
+        server.createContext("/api/chat", app::handleChat);
         server.setExecutor(Executors.newFixedThreadPool(16));
         server.start();
 
@@ -105,6 +111,7 @@ public class CurrencyWebServer {
         System.out.println("   Currency Converter - Web App");
         System.out.println("   Rates: " + app.sourceDescription);
         System.out.println("   History: " + historyStore.describe());
+        System.out.println("   AI Bot: " + (chatService.isConfigured() ? "Google Gemini (Active)" : "Offline Local Mode"));
         System.out.println("   Open http://localhost:" + port + " in your browser");
         System.out.println("==============================================");
     }
@@ -198,6 +205,78 @@ public class CurrencyWebServer {
         }
     }
 
+    private void handleChat(HttpExchange exchange) throws IOException {
+        if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) {
+            sendJson(exchange, 405, "{\"error\":\"Method not allowed.\"}");
+            return;
+        }
+
+        byte[] requestBytes = exchange.getRequestBody().readAllBytes();
+        String body = new String(requestBytes, StandardCharsets.UTF_8);
+
+        String message = extractJsonField(body, "message");
+        if (message == null || message.isBlank()) {
+            sendJson(exchange, 400, "{\"error\":\"Message is required.\"}");
+            return;
+        }
+
+        if (!chatService.isConfigured()) {
+            sendJson(exchange, 503, "{\"error\":\"Gemini AI key is not configured.\",\"source\":\"fallback\"}");
+            return;
+        }
+
+        try {
+            String reply = chatService.ask(message, rateProvider);
+            String json = "{\"reply\":\"" + jsonEscape(reply) + "\",\"source\":\"gemini\"}";
+            sendJson(exchange, 200, json);
+        } catch (Exception ex) {
+            String errDetail = ex.getMessage() != null ? ex.getMessage() : ex.toString();
+            System.out.println("[warn] Gemini chat failed: " + errDetail);
+            sendJson(exchange, 502, "{\"error\":\"" + escape(errDetail) + "\",\"source\":\"fallback\"}");
+        }
+    }
+
+    private String extractJsonField(String json, String field) {
+        String key = "\"" + field + "\"";
+        int start = json.indexOf(key);
+        if (start < 0) return null;
+        int colon = json.indexOf(":", start + key.length());
+        if (colon < 0) return null;
+        int firstQuote = json.indexOf("\"", colon + 1);
+        if (firstQuote < 0) return null;
+
+        StringBuilder sb = new StringBuilder();
+        boolean escaped = false;
+        for (int i = firstQuote + 1; i < json.length(); i++) {
+            char ch = json.charAt(i);
+            if (escaped) {
+                if (ch == 'n') sb.append('\n');
+                else if (ch == 'r') {}
+                else if (ch == 't') sb.append('\t');
+                else if (ch == '"') sb.append('"');
+                else if (ch == '\\') sb.append('\\');
+                else sb.append(ch);
+                escaped = false;
+            } else if (ch == '\\') {
+                escaped = true;
+            } else if (ch == '"') {
+                break;
+            } else {
+                sb.append(ch);
+            }
+        }
+        return sb.toString().trim();
+    }
+
+    private String jsonEscape(String text) {
+        if (text == null) return "";
+        return text.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "")
+                .replace("\t", "\\t");
+    }
+
     private void handleStatic(HttpExchange exchange) throws IOException {
         if (!isGet(exchange)) {
             sendText(exchange, 405, "Method not allowed.");
@@ -285,6 +364,8 @@ public class CurrencyWebServer {
         if (name.endsWith(".json")) return "application/json; charset=utf-8";
         if (name.endsWith(".svg")) return "image/svg+xml";
         if (name.endsWith(".png")) return "image/png";
+        if (name.endsWith(".jpg") || name.endsWith(".jpeg")) return "image/jpeg";
+        if (name.endsWith(".webp")) return "image/webp";
         if (name.endsWith(".ico")) return "image/x-icon";
         return "application/octet-stream";
     }

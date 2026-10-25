@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,193 +11,220 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
-<div class="portal-container">
-    <!-- Navigation Dock -->
-    <nav class="nav-dock">
-        <div class="nav-brand">
-            <span class="brand-logo">💎</span>
-            <span class="brand-name">RatesHub</span>
-        </div>
-        <div class="nav-menu">
-            <button class="nav-item active" data-view="converter" title="Currency Converter">
-                <span class="nav-icon">🔄</span>
-                <span class="nav-label">Converter</span>
-            </button>
-            <button class="nav-item" data-view="rates" title="Today's Exchange Rates">
-                <span class="nav-icon">💵</span>
-                <span class="nav-label">Live Rates</span>
-            </button>
-            <button class="nav-item" data-view="charts" title="Historical Trend Chart">
-                <span class="nav-icon">📈</span>
-                <span class="nav-label">Trend Chart</span>
-            </button>
-            <button class="nav-item" data-view="history" title="Recent History">
-                <span class="nav-icon">🕒</span>
-                <span class="nav-label">History</span>
-            </button>
-            <button class="nav-item" data-view="assistant" title="AI Assistant Chatbot">
-                <span class="nav-icon">🤖</span>
-                <span class="nav-label">AI Bot</span>
-            </button>
-        </div>
-    </nav>
+    <div class="portal-container">
+        <!-- Floating Top Navigation Header -->
+        <header class="top-nav-bar">
+            <div class="top-nav-container">
+                <div class="nav-brand">
+                    <span class="brand-logo">💎</span>
+                    <div class="brand-meta">
+                        <span class="brand-name">RatesHub</span>
+                        <span class="brand-subtitle">Global FX & AI Assistant</span>
+                    </div>
+                </div>
 
-    <!-- Main Content Area -->
-    <main class="portal-main">
-        <!-- View 1: Converter Pane -->
-        <section class="view-pane active" id="view-converter">
-            <div class="view-header">
-                <h1>Currency Converter</h1>
-                <p class="view-subtitle">Convert between 155 global currencies instantly</p>
-            </div>
-            
-            <div class="panel">
-                <div class="converter-layout">
-                    <!-- Column 1: Inputs -->
-                    <div class="converter-form">
-                        <div class="input-group">
-                            <label for="amount">Amount</label>
-                            <input type="number" id="amount" min="0" step="any" value="100" autocomplete="off" placeholder="Enter amount">
-                        </div>
+                <nav class="nav-menu">
+                    <button class="nav-item active" data-view="converter" title="Currency Converter">
+                        <span class="nav-icon">🔄</span>
+                        <span class="nav-label">Converter</span>
+                    </button>
+                    <button class="nav-item" data-view="rates" title="Today's Exchange Rates">
+                        <span class="nav-icon">💵</span>
+                        <span class="nav-label">Live Rates</span>
+                    </button>
+                    <button class="nav-item" data-view="charts" title="Historical Trend Chart">
+                        <span class="nav-icon">📈</span>
+                        <span class="nav-label">Trend Chart</span>
+                    </button>
+                    <button class="nav-item" data-view="history" title="Recent History">
+                        <span class="nav-icon">🕒</span>
+                        <span class="nav-label">History</span>
+                    </button>
+                    <button class="nav-item" data-view="assistant" title="AI Assistant Chatbot">
+                        <span class="nav-icon">🤖</span>
+                        <span class="nav-label">AI Bot</span>
+                    </button>
+                </nav>
 
-                        <div class="row">
-                            <div class="col">
-                                <label>From</label>
-                                <div class="custom-select-wrapper" id="from-wrapper">
-                                    <div class="custom-select-trigger" id="from-trigger">
-                                        <span class="flag-ui" id="from-flag-ui">🇺🇸</span>
-                                        <span class="code-ui" id="from-code-ui">USD</span>
-                                        <span class="arrow">&#9662;</span>
-                                    </div>
-                                    <div class="custom-options-container" id="from-options-container">
-                                        <input type="text" class="custom-select-search" id="from-search" placeholder="Type currency or country..." autocomplete="off">
-                                        <div class="custom-options-list" id="from-options-list"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <button id="swap" title="Swap currencies">&#8646;</button>
-                            
-                            <div class="col">
-                                <label>To</label>
-                                <div class="custom-select-wrapper" id="to-wrapper">
-                                    <div class="custom-select-trigger" id="to-trigger">
-                                        <span class="flag-ui" id="to-flag-ui">🇮🇳</span>
-                                        <span class="code-ui" id="to-code-ui">INR</span>
-                                        <span class="arrow">&#9662;</span>
-                                    </div>
-                                    <div class="custom-options-container" id="to-options-container">
-                                        <input type="text" class="custom-select-search" id="to-search" placeholder="Type currency or country..." autocomplete="off">
-                                        <div class="custom-options-list" id="to-options-list"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Result Display — inline between inputs and button -->
-                        <div class="converter-result-container">
-                            <div id="result" class="result">
-                                <div id="result-main">Converting...</div>
-                                <div id="result-rate"></div>
-                            </div>
-                            <div id="error" class="error hidden"></div>
-                        </div>
-
-                        <button id="convert-btn" class="convert-btn">Convert Currency</button>
+                <div class="top-nav-right">
+                    <div class="live-status-badge">
+                        <span class="pulse-dot"></span>
+                        <span class="status-label">155 Pairs Live</span>
                     </div>
                 </div>
             </div>
-        </section>
+        </header>
 
-        <!-- View 2: Live Rates Grid Pane -->
-        <section class="view-pane" id="view-rates">
-            <div class="view-header">
-                <h1>Live Exchange Rates</h1>
-                <p class="view-subtitle" id="rates-subtitle">Compare popular currencies at a glance</p>
-            </div>
-            
-            <div class="panel">
-                <div class="widget-header">
-                    <h2>Popular Targets</h2>
-                    <span class="base-badge" id="base-badge">1 USD</span>
+        <!-- Main Content Area -->
+        <main class="portal-main">
+            <!-- View 1: Converter Pane -->
+            <section class="view-pane active" id="view-converter">
+                <div class="view-header">
+                    <h1>Currency Converter</h1>
+                    <p class="view-subtitle">Convert between 155 global currencies instantly</p>
                 </div>
-                <div class="comparison-grid" id="comparison-grid">
-                    <!-- Dynamically populated compare cards -->
-                </div>
-            </div>
-        </section>
 
-        <!-- View 3: Trend Chart Pane -->
-        <section class="view-pane" id="view-charts">
-            <div class="view-header">
-                <h1>Historical Trends</h1>
-                <p class="view-subtitle" id="chart-subtitle">Analyze rate changes over time</p>
-            </div>
-            
-            <div class="panel">
-                <div class="widget-header">
-                    <h2 id="chart-title-text">USD to INR History</h2>
-                    <div class="timeframe-selector">
-                        <button class="timeframe-btn active" data-days="7">7D</button>
-                        <button class="timeframe-btn" data-days="30">30D</button>
+                <div class="panel">
+                    <div class="converter-layout">
+                        <!-- Column 1: Inputs -->
+                        <div class="converter-form">
+                            <div class="input-group">
+                                <label for="amount">Amount</label>
+                                <input type="number" id="amount" min="0" step="any" value="100" autocomplete="off"
+                                    placeholder="Enter amount">
+                            </div>
+
+                            <div class="row">
+                                <div class="col">
+                                    <label>From</label>
+                                    <div class="custom-select-wrapper" id="from-wrapper">
+                                        <div class="custom-select-trigger" id="from-trigger">
+                                            <span class="flag-ui" id="from-flag-ui">🇺🇸</span>
+                                            <span class="code-ui" id="from-code-ui">USD</span>
+                                            <span class="arrow">&#9662;</span>
+                                        </div>
+                                        <div class="custom-options-container" id="from-options-container">
+                                            <input type="text" class="custom-select-search" id="from-search"
+                                                placeholder="Type currency or country..." autocomplete="off">
+                                            <div class="custom-options-list" id="from-options-list"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button id="swap" title="Swap currencies">&#8646;</button>
+
+                                <div class="col">
+                                    <label>To</label>
+                                    <div class="custom-select-wrapper" id="to-wrapper">
+                                        <div class="custom-select-trigger" id="to-trigger">
+                                            <span class="flag-ui" id="to-flag-ui">🇮🇳</span>
+                                            <span class="code-ui" id="to-code-ui">INR</span>
+                                            <span class="arrow">&#9662;</span>
+                                        </div>
+                                        <div class="custom-options-container" id="to-options-container">
+                                            <input type="text" class="custom-select-search" id="to-search"
+                                                placeholder="Type currency or country..." autocomplete="off">
+                                            <div class="custom-options-list" id="to-options-list"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Result Display — inline between inputs and button -->
+                            <div class="converter-result-container">
+                                <div id="result" class="result">
+                                    <div id="result-main">Converting...</div>
+                                    <div id="result-rate"></div>
+                                </div>
+                                <div id="error" class="error hidden"></div>
+                            </div>
+
+                            <button id="convert-btn" class="convert-btn">Convert Currency</button>
+                        </div>
                     </div>
                 </div>
-                <div class="chart-container">
-                    <canvas id="historicalChart"></canvas>
-                </div>
-            </div>
-        </section>
+            </section>
 
-        <!-- View 4: Recent History Pane -->
-        <section class="view-pane" id="view-history">
-            <div class="view-header">
-                <h1>Recent Conversions</h1>
-                <p class="view-subtitle">Your local log of past calculations</p>
-            </div>
-            
-            <div class="panel">
-                <div class="widget-header">
-                    <h2>History Log</h2>
-                    <button id="clear-history" class="clear-btn">Clear History</button>
-                </div>
-                <div class="history-list" id="history-list">
-                    <!-- Dynamically populated conversions history -->
-                    <div class="no-history">No recent conversions.</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- View 5: AI Assistant Chatbot Pane -->
-        <section class="view-pane" id="view-assistant">
-            <div class="view-header">
-                <h1>AI Financial Bot</h1>
-                <p class="view-subtitle">Ask questions, request calculations, or get exchange information</p>
-            </div>
-            
-            <div class="panel chat-panel">
-                <div class="chat-thread" id="chat-thread">
-                    <!-- Chat messages populated here -->
+            <!-- View 2: Live Rates Grid Pane -->
+            <section class="view-pane" id="view-rates">
+                <div class="view-header">
+                    <h1>Live Exchange Rates</h1>
+                    <p class="view-subtitle" id="rates-subtitle">Compare popular currencies at a glance</p>
                 </div>
 
-                <div class="chat-suggestions" id="chat-suggestions">
-                    <button class="suggest-badge" data-query="How do I use this converter?">How to use?</button>
-                    <button class="suggest-badge" data-query="What is the exchange rate of USD to EUR?">USD to EUR rate</button>
-                    <button class="suggest-badge" data-query="Convert 250 CAD to INR">Convert 250 CAD to INR</button>
-                    <button class="suggest-badge" data-query="List all supported currencies">List Currencies</button>
+                <div class="panel">
+                    <div class="widget-header">
+                        <h2>Popular Targets</h2>
+                        <span class="base-badge" id="base-badge">1 USD</span>
+                    </div>
+                    <div class="comparison-grid" id="comparison-grid">
+                        <!-- Dynamically populated compare cards -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- View 3: Trend Chart Pane -->
+            <section class="view-pane" id="view-charts">
+                <div class="view-header">
+                    <h1>Historical Trends</h1>
+                    <p class="view-subtitle" id="chart-subtitle">Analyze rate changes over time</p>
                 </div>
 
-                <div class="chat-input-bar">
-                    <input type="text" id="chat-input" placeholder="Type a message or conversion request..." autocomplete="off">
-                    <button id="chat-send" title="Send message">Send</button>
+                <div class="panel">
+                    <div class="widget-header">
+                        <h2 id="chart-title-text">USD to INR History</h2>
+                        <div class="timeframe-selector">
+                            <button class="timeframe-btn active" data-days="7">7D</button>
+                            <button class="timeframe-btn" data-days="30">30D</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="historicalChart"></canvas>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <footer id="source">Rates cache loaded...</footer>
-    </main>
-</div>
+            <!-- View 4: Recent History Pane -->
+            <section class="view-pane" id="view-history">
+                <div class="view-header">
+                    <h1>Recent Conversions</h1>
+                    <p class="view-subtitle">Your local log of past calculations</p>
+                </div>
 
-<script src="app.js"></script>
+                <div class="panel">
+                    <div class="widget-header">
+                        <h2>History Log</h2>
+                        <button id="clear-history" class="clear-btn">Clear History</button>
+                    </div>
+                    <div class="history-list" id="history-list">
+                        <!-- Dynamically populated conversions history -->
+                        <div class="no-history">No recent conversions.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- View 5: AI Assistant Chatbot Pane -->
+            <section class="view-pane" id="view-assistant">
+                <div class="view-header">
+                    <div>
+                        <div class="ai-header-title">
+                            <h1>RatesHub AI Assistant</h1>
+                            <span class="ai-status-pill"><span class="pulse-dot"></span> Gemini 3.5 Active</span>
+                        </div>
+                        <p class="view-subtitle">Powered by Google Gemini — ask conversions, travel budgets, or currency questions</p>
+                    </div>
+                    <button id="clear-chat" class="clear-btn" title="Clear Chat History">Clear Chat</button>
+                </div>
+
+                <div class="panel chat-panel">
+                    <div class="chat-thread" id="chat-thread">
+                        <!-- Chat messages populated here -->
+                    </div>
+
+                    <div class="chat-suggestions" id="chat-suggestions">
+                        <button class="suggest-badge" data-query="How much is 500 USD in EUR today?">500 USD to EUR</button>
+                        <button class="suggest-badge" data-query="I am travelling to Japan for 7 days with $1500, what is my daily Yen budget?">Japan Trip Budget</button>
+                        <button class="suggest-badge" data-query="Compare the British Pound vs Euro right now">GBP vs EUR</button>
+                        <button class="suggest-badge" data-query="What currencies are used in Dubai and Switzerland?">Dubai & Swiss</button>
+                        <button class="suggest-badge" data-query="Convert 100 bucks to Canadian dollars">100 bucks in CAD</button>
+                    </div>
+
+                    <div class="chat-input-bar">
+                        <button id="chat-mic" class="chat-icon-btn" title="Voice Input (Speech-to-Text)">🎙️</button>
+                        <input type="text" id="chat-input" placeholder="Ask RatesHub AI anything (e.g. 'Convert 250 quid to INR' or 'Trip budget')..."
+                            autocomplete="off">
+                        <button id="chat-send" title="Send message">Send</button>
+                    </div>
+                </div>
+            </section>
+
+            <footer id="source">Rates cache loaded...</footer>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
 </body>
+
 </html>

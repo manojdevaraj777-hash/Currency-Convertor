@@ -1,4 +1,4 @@
-window.onerror = function(message, source, lineno, colno, error) {
+window.onerror = function (message, source, lineno, colno, error) {
     alert("JS Error: " + message + " at " + lineno + ":" + colno);
     return false;
 };
@@ -70,7 +70,7 @@ function hideError() {
 // Custom Seeded Pseudo-Random Number Generator for consistent offline charts
 function createRandom(seed) {
     let s = seed;
-    return function() {
+    return function () {
         s = (s * 9301 + 49297) % 233280;
         return s / 233280;
     };
@@ -237,13 +237,13 @@ async function convert() {
         // Draw country flags in the result section using images
         const toCountry = data.toCountry || "in";
         const fromCountry = data.fromCountry || "us";
-        
+
         $("result-main").innerHTML = `<img class="flag-img" src="https://flagcdn.com/w40/${fromCountry.toLowerCase()}.png" alt="${data.from}"> ${formatNum(data.amount)} ${data.from}  <span class="result-arrow">&rarr;</span>  <img class="flag-img" src="https://flagcdn.com/w40/${toCountry.toLowerCase()}.png" alt="${data.to}"> <strong>${formatNum(data.result)} ${data.to}</strong>`;
         $("result-rate").innerHTML = `1 ${data.from} = ${formatNum(data.rate, 5)} ${data.to}`;
         $("source").textContent = `Rates: ${data.source}`;
 
         currentRate = Number(data.rate);
-        
+
         // Backend automatically stores conversion logs now
     } catch (networkError) {
         showError("Unable to reach the server. Is it online?");
@@ -289,7 +289,7 @@ function drawChart() {
         const d = new Date();
         d.setDate(today.getDate() - (activeTimeframe - 1 - i));
         dates[i] = d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-        const step = (rand() - 0.5) * 0.024; 
+        const step = (rand() - 0.5) * 0.024;
         walkingRate = walkingRate * (1 - step);
     }
 
@@ -332,7 +332,7 @@ function drawChart() {
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
     ctx.fillStyle = "rgba(156, 163, 175, 0.6)";
-    
+
     const stride = activeTimeframe === 30 ? 6 : 1;
     for (let i = 0; i < activeTimeframe; i += stride) {
         ctx.fillText(dates[i], chartPoints[i].x, paddingTop + chartH + 6);
@@ -493,7 +493,7 @@ async function loadComparisonGrid(fromCode) {
             if (targetCurrency) {
                 currentTo = targetCurrency.code;
                 updateDropdownTrigger("to", targetCurrency.code, targetCurrency.country);
-                
+
                 // Switch back to converter view
                 const converterNav = document.querySelector('.nav-item[data-view="converter"]');
                 if (converterNav) converterNav.click();
@@ -548,13 +548,13 @@ async function renderHistory() {
                 const item = history[idx];
                 if (item) {
                     amountInput.value = item.amount;
-                    
+
                     currentFrom = item.from;
                     updateDropdownTrigger("from", item.from, item.fromCountry || "us");
-                    
+
                     currentTo = item.to;
                     updateDropdownTrigger("to", item.to, item.toCountry || "in");
-                    
+
                     // Switch back to converter view
                     const converterNav = document.querySelector('.nav-item[data-view="converter"]');
                     if (converterNav) converterNav.click();
@@ -578,31 +578,71 @@ $("clear-history").addEventListener("click", async () => {
 // ----------------------------------------------------
 // AI Assistant Chatbot Engine
 // ----------------------------------------------------
+// AI Assistant Chatbot Engine (Powered by Google Gemini with Local Fallback)
+// ----------------------------------------------------
 const chatThread = $("chat-thread");
 const chatInput = $("chat-input");
 const chatSend = $("chat-send");
 const chatSuggestions = $("chat-suggestions");
+const chatClear = $("clear-chat");
+const chatMic = $("chat-mic");
 
 let chatGreetingInitialized = false;
+let speechRecognizer = null;
+let isRecording = false;
 
 function initChatbotGreeting() {
     if (chatGreetingInitialized) return;
     chatGreetingInitialized = true;
-    
-    appendChatMessage("bot", "Hello! I am your RatesHub AI assistant 🤖. I can check live currency rates, execute conversions, or explain how to navigate the portal. Try typing something like: <b>'convert 250 USD to EUR'</b> or <b>'GBP to INR'</b>!");
+
+    appendChatMessage("bot", 
+        "Hello! I am your <strong>RatesHub AI Assistant</strong> 🤖 powered by <strong>Google Gemini</strong>.<br/><br/>" +
+        "You can ask me anything about currencies, travel budgets, exchange rate comparisons, or conversions! Try:<br/>" +
+        "• <em>'Convert 500 bucks to Euros'</em><br/>" +
+        "• <em>'I'm travelling to Japan for a week with $1,200, what is my daily budget in Yen?'</em><br/>" +
+        "• <em>'Is the British Pound stronger than the Euro right now?'</em>",
+        { source: "Gemini 3.5" }
+    );
 }
 
-function appendChatMessage(sender, text) {
-    // Remove typing indicator if it exists
+function appendChatMessage(sender, htmlContent, meta = {}) {
     const indicator = $("typing-indicator-node");
     if (indicator) indicator.remove();
 
     const msg = document.createElement("div");
     msg.className = `chat-msg ${sender}`;
+
+    let sourceBadge = "";
+    if (sender === "bot" && meta.source) {
+        sourceBadge = `<div class="chat-source-tag">⚡ ${meta.source}</div>`;
+    }
+
+    let actionsHtml = "";
+    if (meta.actions && meta.actions.from && meta.actions.to) {
+        const from = meta.actions.from;
+        const to = meta.actions.to;
+        const amt = meta.actions.amount || 100;
+        actionsHtml = `
+            <div class="chat-actions">
+                <button class="chat-action-btn" onclick="applyConverterFromChat('${from}', '${to}', ${amt})">
+                    🔄 Open ${from} &rarr; ${to} in Converter
+                </button>
+                <button class="chat-action-btn" onclick="openChartFromChat('${from}', '${to}')">
+                    📈 View ${from}/${to} Trend Chart
+                </button>
+            </div>
+        `;
+    }
+
     msg.innerHTML = `
         <div class="msg-avatar">${sender === "bot" ? "🤖" : "👤"}</div>
-        <div class="msg-bubble">${text}</div>
+        <div class="msg-bubble">
+            ${sourceBadge}
+            <div>${htmlContent}</div>
+            ${actionsHtml}
+        </div>
     `;
+
     chatThread.appendChild(msg);
     chatThread.scrollTop = chatThread.scrollHeight;
 }
@@ -623,6 +663,80 @@ function showTypingIndicator() {
     chatThread.scrollTop = chatThread.scrollHeight;
 }
 
+// Format markdown from Gemini (bold, italic, code, bullet points, linebreaks)
+function formatChatMarkdown(text) {
+    if (!text) return "";
+    let safe = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+    // Bold: **text**
+    safe = safe.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    // Italic: *text*
+    safe = safe.replace(/\*([^\*\n]+)\*/g, "<em>$1</em>");
+    // Inline code: `text`
+    safe = safe.replace(/`([^`\n]+)`/g, "<code class='chat-code'>$1</code>");
+    // Bullet list items
+    safe = safe.replace(/^\s*[\*\-]\s+(.*)$/gim, "<li>$1</li>");
+    safe = safe.replace(/(<li>.*<\/li>)/gs, "<ul>$1</ul>");
+    // Line breaks
+    safe = safe.replace(/\n\n/g, "<br/><br/>").replace(/\n/g, "<br/>");
+    return safe;
+}
+
+// Detect currency pairs for quick action buttons
+function detectCurrencyActions(text) {
+    if (!text || !window.CURRENCIES) return null;
+    const codes = window.CURRENCIES.map(c => c.code);
+    const words = text.toUpperCase().match(/\b[A-Z]{3}\b/g) || [];
+    const found = [];
+    for (const w of words) {
+        if (codes.includes(w) && !found.includes(w)) {
+            found.push(w);
+        }
+    }
+
+    // Check for amount
+    const amtMatch = text.match(/\b(\d+(?:\.\d+)?)\b/);
+    const amount = amtMatch ? parseFloat(amtMatch[1]) : 100;
+
+    if (found.length >= 2) {
+        return { from: found[0], to: found[1], amount: amount };
+    }
+    return null;
+}
+
+// Action button handlers to bridge chat with other tabs
+window.applyConverterFromChat = function(from, to, amount) {
+    if (amount) amountInput.value = amount;
+    currentFrom = from;
+    const fCurr = window.CURRENCIES.find(c => c.code === from);
+    updateDropdownTrigger("from", from, fCurr ? fCurr.country : "us");
+
+    currentTo = to;
+    const tCurr = window.CURRENCIES.find(c => c.code === to);
+    updateDropdownTrigger("to", to, tCurr ? tCurr.country : "in");
+
+    // Switch to converter view
+    const convTab = document.querySelector('.nav-item[data-view="converter"]');
+    if (convTab) convTab.click();
+    convert();
+};
+
+window.openChartFromChat = function(from, to) {
+    currentFrom = from;
+    const fCurr = window.CURRENCIES.find(c => c.code === from);
+    updateDropdownTrigger("from", from, fCurr ? fCurr.country : "us");
+
+    currentTo = to;
+    const tCurr = window.CURRENCIES.find(c => c.code === to);
+    updateDropdownTrigger("to", to, tCurr ? tCurr.country : "in");
+
+    const chartTab = document.querySelector('.nav-item[data-view="charts"]');
+    if (chartTab) chartTab.click();
+};
+
 // Process user chatbot query
 async function handleUserChatMessage(text) {
     const rawQuery = text.trim();
@@ -632,70 +746,217 @@ async function handleUserChatMessage(text) {
     chatInput.value = "";
     showTypingIndicator();
 
-    setTimeout(async () => {
-        const query = rawQuery.toLowerCase();
-        
-        // 1. Match Conversion pattern (e.g. "convert 100 USD to EUR" or "100 usd inr")
-        const convertRegex = /(\d+(?:\.\d+)?)\s*([a-z]{3})\s*(?:to|in)?\s*([a-z]{3})/i;
-        const matchConvert = query.match(convertRegex);
+    try {
+        const response = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: rawQuery })
+        });
 
-        // 2. Match Rate query pattern (e.g. "USD to EUR rate" or "usd inr")
-        const rateRegex = /([a-z]{3})\s*(?:to|in)?\s*([a-z]{3})/i;
-        const matchRate = query.match(rateRegex);
-
-        if (matchConvert) {
-            const amount = parseFloat(matchConvert[1]);
-            const from = matchConvert[2].toUpperCase();
-            const to = matchConvert[3].toUpperCase();
-            
-            await performChatbotConversion(amount, from, to);
-        } else if (matchRate) {
-            const from = matchRate[1].toUpperCase();
-            const to = matchRate[2].toUpperCase();
-            
-            await performChatbotConversion(1, from, to);
-        } else if (query.includes("how") || query.includes("use") || query.includes("help")) {
-            appendChatMessage("bot", "To convert currencies, navigate to the <b>Converter tab (🔄)</b>, enter an amount, and choose your currencies from the searchable dropdown trigger inputs. You can click the 🔄 swap button to invert them! Use the other tabs to see charts and popular rates.");
-        } else if (query.includes("list") || query.includes("support")) {
-            appendChatMessage("bot", "We support 155 global currencies, including USD (US Dollar), EUR (Euro), INR (Indian Rupee), GBP (British Pound), JPY (Japanese Yen), CAD (Canadian Dollar), and AUD (Australian Dollar). Select a currency dropdown to see the full list with search support.");
-        } else {
-            appendChatMessage("bot", "I'm sorry, I didn't quite catch that. You can ask me to perform conversions directly by typing something like <b>'convert 100 USD to INR'</b> or <b>'EUR to GBP'</b>.");
+        const data = await response.json();
+        if (response.ok && data.reply) {
+            const formatted = formatChatMarkdown(data.reply);
+            const actions = detectCurrencyActions(rawQuery + " " + data.reply);
+            appendChatMessage("bot", formatted, { source: "Gemini 3.5", actions: actions });
+            updateSuggestionsAfterQuery(rawQuery, actions);
+            return;
         }
-    }, 1000);
+    } catch (networkError) {
+        console.warn("Backend chat endpoint failed, using local offline fallback", networkError);
+    }
+
+    // Offline / Fallback local handler
+    setTimeout(() => {
+        performLocalChatResponse(rawQuery);
+    }, 400);
+}
+
+// Intelligent AI Assistant Response Engine
+async function performLocalChatResponse(rawQuery) {
+    const query = rawQuery.toLowerCase();
+
+    // 1. Expand currency nicknames & colloquial terms
+    let normalized = query
+        .replace(/\bcanadian dollars?\b/g, "cad")
+        .replace(/\baussie dollars?\b/g, "aud")
+        .replace(/\bus dollars?\b/g, "usd")
+        .replace(/\bdollars?\b/g, "usd")
+        .replace(/\bbucks?\b/g, "usd")
+        .replace(/\bquid\b/g, "gbp")
+        .replace(/\bpounds?\b/g, "gbp")
+        .replace(/\beuros?\b/g, "eur")
+        .replace(/\byen\b/g, "jpy")
+        .replace(/\brupees?\b/g, "inr")
+        .replace(/\bloonies?\b/g, "cad")
+        .replace(/\bdirhams?\b/g, "aed")
+        .replace(/\bfrancs?\b/g, "chf")
+        .replace(/\bbaht\b/g, "thb")
+        .replace(/\bwon\b/g, "krw")
+        .replace(/\byuan\b/g, "cny")
+        .replace(/\bpesos?\b/g, "mxn")
+        .replace(/\bdinars?\b/g, "kwd");
+
+    // 2. Extract all recognized 3-letter currency codes
+    const words = normalized.toUpperCase().match(/\b[A-Z]{3}\b/g) || [];
+    const validCodes = [];
+    if (window.CURRENCIES) {
+        const supported = window.CURRENCIES.map(c => c.code);
+        for (const w of words) {
+            if (supported.includes(w) && !validCodes.includes(w)) {
+                validCodes.push(w);
+            }
+        }
+    }
+
+    // 3. Extract amount (e.g. 100, 250.50)
+    const amountMatch = normalized.match(/\b(\d+(?:\.\d+)?)\b/);
+    const amount = amountMatch ? parseFloat(amountMatch[1]) : 100;
+
+    // Pattern A: Two currencies found (e.g. USD and INR)
+    if (validCodes.length >= 2) {
+        await performChatbotConversion(amount, validCodes[0], validCodes[1]);
+        return;
+    }
+
+    // Pattern B: One currency found with amount -> convert against active currentTo
+    if (validCodes.length === 1) {
+        const target = (validCodes[0] === currentFrom) ? currentTo : currentFrom;
+        await performChatbotConversion(amount, validCodes[0], target);
+        return;
+    }
+
+    // Pattern C: Conversational intents
+    if (query.includes("how") || query.includes("use") || query.includes("help")) {
+        appendChatMessage("bot", 
+            "To convert currencies, open the <b>Converter tab (🔄)</b>, enter an amount, and choose any of the 155 countries. You can also view live 7D/30D trend charts or ask me to convert directly here in the chat!",
+            { source: "RatesHub AI" }
+        );
+    } else if (query.includes("list") || query.includes("support") || query.includes("currency") || query.includes("currencies")) {
+        appendChatMessage("bot", 
+            "RatesHub supports <strong>155 global currencies</strong> including USD, EUR, INR, GBP, JPY, CAD, AUD, AED, CHF, and CNY with real-time daily exchange rates. Select any dropdown to see flags and names.",
+            { source: "RatesHub AI" }
+        );
+    } else if (query.includes("hi") || query.includes("hello") || query.includes("hey")) {
+        appendChatMessage("bot", 
+            "Hello! I am your <strong>RatesHub AI Financial Assistant</strong> 🤖. I can convert currencies, explain exchange rates, and calculate travel budgets.<br/><br/>Try typing something like: <b>'convert 250 USD to EUR'</b> or <b>'1000 bucks to INR'</b>!",
+            { source: "RatesHub AI" }
+        );
+    } else {
+        appendChatMessage("bot", 
+            "I am ready to help you with any currency conversion! Simply type what you want to calculate, for example: <b>'convert 100 USD to EUR'</b> or <b>'500 dollars in rupees'</b>.",
+            { source: "RatesHub AI" }
+        );
+    }
 }
 
 async function performChatbotConversion(amount, from, to) {
-    const validFrom = window.CURRENCIES.find(c => c.code === from);
-    const validTo = window.CURRENCIES.find(c => c.code === to);
+    const validFrom = window.CURRENCIES ? window.CURRENCIES.find(c => c.code === from) : null;
+    const validTo = window.CURRENCIES ? window.CURRENCIES.find(c => c.code === to) : null;
 
     if (!validFrom || !validTo) {
-        appendChatMessage("bot", `Sorry, one of the currency codes you entered is not supported. (Entered: ${from} & ${to}). We support 155 codes like USD, EUR, INR, GBP, etc.`);
+        appendChatMessage("bot", `Sorry, code <strong>${from}</strong> or <strong>${to}</strong> is not recognized. Please use supported currency codes like USD, EUR, INR, GBP, etc.`, { source: "RatesHub AI" });
         return;
     }
 
     try {
         const res = await fetch(`/api/convert?from=${from}&to=${to}&amount=${amount}`);
         const data = await res.json();
-        
+
         if (res.ok) {
             const fCountry = data.fromCountry || "us";
             const tCountry = data.toCountry || "in";
-            appendChatMessage("bot", `Conversion completed: <br/><b>${formatNum(amount)} <img class="flag-img" src="https://flagcdn.com/w40/${fCountry.toLowerCase()}.png" alt="${from}"> ${from} = ${formatNum(data.result)} <img class="flag-img" src="https://flagcdn.com/w40/${tCountry.toLowerCase()}.png" alt="${to}"> ${to}</b><br/>(Rate: 1 ${from} = ${formatNum(data.rate, 4)} ${to})`);
-            
-            // Set main converter state to this query so users see it preloaded
-            amountInput.value = amount;
-            currentFrom = from;
-            updateDropdownTrigger("from", from, fCountry);
-            currentTo = to;
-            updateDropdownTrigger("to", to, tCountry);
-            
-            // Trigger actual conversion to sync background variables
-            convert();
+            appendChatMessage("bot", 
+                `<strong>Conversion Result:</strong><br/>` +
+                `<b>${formatNum(amount)} <img class="flag-img" src="https://flagcdn.com/w40/${fCountry.toLowerCase()}.png" alt="${from}"> ${from}</b> = ` +
+                `<strong>${formatNum(data.result)} <img class="flag-img" src="https://flagcdn.com/w40/${tCountry.toLowerCase()}.png" alt="${to}"> ${to}</strong><br/>` +
+                `<em>(Live Exchange Rate: 1 ${from} = ${formatNum(data.rate, 4)} ${to})</em>`,
+                { source: "RatesHub AI", actions: { from, to, amount } }
+            );
+
+            // Update suggestion chips for next steps
+            updateSuggestionsAfterQuery(from + " " + to, { from, to, amount });
         } else {
-            appendChatMessage("bot", `Failed to complete conversion: ${data.error}`);
+            appendChatMessage("bot", `Failed to complete conversion: ${data.error}`, { source: "RatesHub AI" });
         }
     } catch (e) {
-        appendChatMessage("bot", "I could not reach the conversion server. Please check if the backend is running.");
+        appendChatMessage("bot", "I could not reach the conversion server. Please check backend connection.", { source: "RatesHub AI" });
+    }
+}
+
+function updateSuggestionsAfterQuery(query, actions) {
+    if (!chatSuggestions) return;
+    if (actions && actions.from && actions.to) {
+        chatSuggestions.innerHTML = `
+            <button class="suggest-badge" data-query="What is the 30-day forecast for ${actions.from} vs ${actions.to}?">30D ${actions.from}/${actions.to} Outlook</button>
+            <button class="suggest-badge" data-query="Compare ${actions.from} with EUR, GBP, and JPY">Compare with EUR/GBP/JPY</button>
+            <button class="suggest-badge" data-query="Calculate a 15% tip on ${actions.amount || 100} ${actions.from}">Calculate 15% Tip</button>
+            <button class="suggest-badge" data-query="What is the best time to exchange ${actions.from} to ${actions.to}?">Best Exchange Time</button>
+        `;
+        bindSuggestionBadges();
+    }
+}
+
+function bindSuggestionBadges() {
+    document.querySelectorAll(".suggest-badge").forEach(badge => {
+        badge.onclick = () => {
+            const q = badge.getAttribute("data-query");
+            if (q) handleUserChatMessage(q);
+        };
+    });
+}
+
+// Clear Chat Event
+if (chatClear) {
+    chatClear.addEventListener("click", () => {
+        chatThread.innerHTML = "";
+        chatGreetingInitialized = false;
+        initChatbotGreeting();
+    });
+}
+
+// Speech-to-Text Microphone Hook
+if (chatMic) {
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRec) {
+        speechRecognizer = new SpeechRec();
+        speechRecognizer.continuous = false;
+        speechRecognizer.interimResults = false;
+        speechRecognizer.lang = "en-US";
+
+        speechRecognizer.onstart = () => {
+            isRecording = true;
+            chatMic.classList.add("recording");
+            chatInput.placeholder = "Listening... Speak now";
+        };
+
+        speechRecognizer.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            if (transcript) {
+                chatInput.value = transcript;
+                handleUserChatMessage(transcript);
+            }
+        };
+
+        speechRecognizer.onerror = (e) => {
+            console.warn("Speech recognition error:", e);
+        };
+
+        speechRecognizer.onend = () => {
+            isRecording = false;
+            chatMic.classList.remove("recording");
+            chatInput.placeholder = "Ask RatesHub AI anything (e.g. 'Convert 250 quid to INR' or 'Trip budget')...";
+        };
+
+        chatMic.addEventListener("click", () => {
+            if (isRecording) {
+                speechRecognizer.stop();
+            } else {
+                speechRecognizer.start();
+            }
+        });
+    } else {
+        chatMic.title = "Voice input is not supported in this browser.";
+        chatMic.style.opacity = "0.4";
     }
 }
 
@@ -707,13 +968,7 @@ chatInput.addEventListener("keydown", (e) => {
     }
 });
 
-// Suggestions chips hook
-document.querySelectorAll(".suggest-badge").forEach(badge => {
-    badge.addEventListener("click", () => {
-        const q = badge.getAttribute("data-query");
-        handleUserChatMessage(q);
-    });
-});
+bindSuggestionBadges();
 
 // ----------------------------------------------------
 // Initialization Hook
@@ -739,10 +994,10 @@ async function init() {
 
     const usd = window.CURRENCIES.find(c => c.code === "USD") || { code: "USD", flag: "🇺🇸", country: "us" };
     const inr = window.CURRENCIES.find(c => c.code === "INR") || { code: "INR", flag: "🇮🇳", country: "in" };
-    
+
     updateDropdownTrigger("from", usd.code, usd.country);
     updateDropdownTrigger("to", inr.code, inr.country);
-    
+
     currentFrom = usd.code;
     currentTo = inr.code;
 
@@ -774,7 +1029,7 @@ async function init() {
         const tempCode = currentFrom;
         currentFrom = currentTo;
         currentTo = tempCode;
-        
+
         const fromCurr = window.CURRENCIES.find(c => c.code === currentFrom);
         const toCurr = window.CURRENCIES.find(c => c.code === currentTo);
 
@@ -782,7 +1037,7 @@ async function init() {
             updateDropdownTrigger("from", currentFrom, fromCurr.country);
             updateDropdownTrigger("to", currentTo, toCurr.country);
         }
-        
+
         $("from-wrapper").render();
         $("to-wrapper").render();
 
