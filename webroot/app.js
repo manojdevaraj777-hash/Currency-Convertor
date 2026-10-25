@@ -596,12 +596,7 @@ function initChatbotGreeting() {
     chatGreetingInitialized = true;
 
     appendChatMessage("bot", 
-        "Hello! I am your <strong>RatesHub AI Assistant</strong> 🤖 powered by <strong>Google Gemini</strong>.<br/><br/>" +
-        "You can ask me anything about currencies, travel budgets, exchange rate comparisons, or conversions! Try:<br/>" +
-        "• <em>'Convert 500 bucks to Euros'</em><br/>" +
-        "• <em>'I'm travelling to Japan for a week with $1,200, what is my daily budget in Yen?'</em><br/>" +
-        "• <em>'Is the British Pound stronger than the Euro right now?'</em>",
-        { source: "Gemini 3.5" }
+        "Welcome to <strong>RatesHub AI</strong>. Ask any currency conversion (e.g. <em>'100 USD to EUR'</em> or <em>'500 dollars in rupees'</em>) or travel budget calculation."
     );
 }
 
@@ -612,11 +607,6 @@ function appendChatMessage(sender, htmlContent, meta = {}) {
     const msg = document.createElement("div");
     msg.className = `chat-msg ${sender}`;
 
-    let sourceBadge = "";
-    if (sender === "bot" && meta.source) {
-        sourceBadge = `<div class="chat-source-tag">⚡ ${meta.source}</div>`;
-    }
-
     let actionsHtml = "";
     if (meta.actions && meta.actions.from && meta.actions.to) {
         const from = meta.actions.from;
@@ -625,23 +615,49 @@ function appendChatMessage(sender, htmlContent, meta = {}) {
         actionsHtml = `
             <div class="chat-actions">
                 <button class="chat-action-btn" onclick="applyConverterFromChat('${from}', '${to}', ${amt})">
-                    🔄 Open ${from} &rarr; ${to} in Converter
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" style="vertical-align:middle; margin-right:4px;">
+                        <path d="M20 7H4M4 7L8 3M4 7L8 11" stroke="url(#silverGrad)" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M4 17H20M20 17L16 13M20 17L16 21" stroke="url(#goldGrad)" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    Open ${from} &rarr; ${to} in Converter
                 </button>
                 <button class="chat-action-btn" onclick="openChartFromChat('${from}', '${to}')">
-                    📈 View ${from}/${to} Trend Chart
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" style="vertical-align:middle; margin-right:4px;">
+                        <path d="M3 20H21" stroke="url(#silverGrad)" stroke-width="1.8"/>
+                        <path d="M4 16L9 11L14 15L21 6" stroke="url(#goldGrad)" stroke-width="2"/>
+                    </svg>
+                    View ${from}/${to} Trend Chart
                 </button>
             </div>
         `;
     }
 
+    const botAvatar = `
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
+            <rect x="5" y="5" width="14" height="14" rx="4" stroke="url(#silverGrad)" stroke-width="1.8" fill="rgba(4, 22, 38, 0.6)"/>
+            <circle cx="12" cy="12" r="3" fill="url(#goldGrad)"/>
+            <path d="M12 1V5M12 19V23M1 12H5M19 12H23" stroke="url(#goldGrad)" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+    `;
+
+    const userAvatar = `
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
+            <circle cx="12" cy="8" r="4" stroke="url(#silverGrad)" stroke-width="1.8" fill="rgba(255, 255, 255, 0.08)"/>
+            <path d="M5 20C5 16.5 8 14 12 14C16 14 19 16.5 19 20" stroke="url(#goldGrad)" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+    `;
+
     msg.innerHTML = `
-        <div class="msg-avatar">${sender === "bot" ? "🤖" : "👤"}</div>
+        <div class="msg-avatar">${sender === "bot" ? botAvatar : userAvatar}</div>
         <div class="msg-bubble">
-            ${sourceBadge}
             <div>${htmlContent}</div>
             ${actionsHtml}
         </div>
     `;
+
+    chatThread.appendChild(msg);
+    chatThread.scrollTop = chatThread.scrollHeight;
+}
 
     chatThread.appendChild(msg);
     chatThread.scrollTop = chatThread.scrollHeight;
@@ -757,7 +773,7 @@ async function handleUserChatMessage(text) {
         if (response.ok && data.reply) {
             const formatted = formatChatMarkdown(data.reply);
             const actions = detectCurrencyActions(rawQuery + " " + data.reply);
-            appendChatMessage("bot", formatted, { source: "Gemini 3.5", actions: actions });
+            appendChatMessage("bot", formatted, { actions: actions });
             updateSuggestionsAfterQuery(rawQuery, actions);
             return;
         }
@@ -828,23 +844,19 @@ async function performLocalChatResponse(rawQuery) {
     // Pattern C: Conversational intents
     if (query.includes("how") || query.includes("use") || query.includes("help")) {
         appendChatMessage("bot", 
-            "To convert currencies, open the <b>Converter tab (🔄)</b>, enter an amount, and choose any of the 155 countries. You can also view live 7D/30D trend charts or ask me to convert directly here in the chat!",
-            { source: "RatesHub AI" }
+            "To convert currencies, open the <b>Converter tab</b>, enter an amount, and choose any of the 155 countries. You can also view live 7D/30D trend charts or ask me to convert directly here in the chat!"
         );
     } else if (query.includes("list") || query.includes("support") || query.includes("currency") || query.includes("currencies")) {
         appendChatMessage("bot", 
-            "RatesHub supports <strong>155 global currencies</strong> including USD, EUR, INR, GBP, JPY, CAD, AUD, AED, CHF, and CNY with real-time daily exchange rates. Select any dropdown to see flags and names.",
-            { source: "RatesHub AI" }
+            "RatesHub supports <strong>155 global currencies</strong> including USD, EUR, INR, GBP, JPY, CAD, AUD, AED, CHF, and CNY with real-time daily exchange rates. Select any dropdown to see flags and names."
         );
     } else if (query.includes("hi") || query.includes("hello") || query.includes("hey")) {
         appendChatMessage("bot", 
-            "Hello! I am your <strong>RatesHub AI Financial Assistant</strong> 🤖. I can convert currencies, explain exchange rates, and calculate travel budgets.<br/><br/>Try typing something like: <b>'convert 250 USD to EUR'</b> or <b>'1000 bucks to INR'</b>!",
-            { source: "RatesHub AI" }
+            "Hello! I am your <strong>RatesHub AI Assistant</strong>. I can convert currencies, explain exchange rates, and calculate travel budgets.<br/><br/>Try typing: <b>'convert 250 USD to EUR'</b> or <b>'1000 bucks to INR'</b>!"
         );
     } else {
         appendChatMessage("bot", 
-            "I am ready to help you with any currency conversion! Simply type what you want to calculate, for example: <b>'convert 100 USD to EUR'</b> or <b>'500 dollars in rupees'</b>.",
-            { source: "RatesHub AI" }
+            "I am ready to help you with any currency conversion! Simply type what you want to calculate, for example: <b>'convert 100 USD to EUR'</b> or <b>'500 dollars in rupees'</b>."
         );
     }
 }
@@ -854,7 +866,7 @@ async function performChatbotConversion(amount, from, to) {
     const validTo = window.CURRENCIES ? window.CURRENCIES.find(c => c.code === to) : null;
 
     if (!validFrom || !validTo) {
-        appendChatMessage("bot", `Sorry, code <strong>${from}</strong> or <strong>${to}</strong> is not recognized. Please use supported currency codes like USD, EUR, INR, GBP, etc.`, { source: "RatesHub AI" });
+        appendChatMessage("bot", `Sorry, code <strong>${from}</strong> or <strong>${to}</strong> is not recognized. Please use supported currency codes like USD, EUR, INR, GBP, etc.`);
         return;
     }
 
@@ -870,16 +882,16 @@ async function performChatbotConversion(amount, from, to) {
                 `<b>${formatNum(amount)} <img class="flag-img" src="https://flagcdn.com/w40/${fCountry.toLowerCase()}.png" alt="${from}"> ${from}</b> = ` +
                 `<strong>${formatNum(data.result)} <img class="flag-img" src="https://flagcdn.com/w40/${tCountry.toLowerCase()}.png" alt="${to}"> ${to}</strong><br/>` +
                 `<em>(Live Exchange Rate: 1 ${from} = ${formatNum(data.rate, 4)} ${to})</em>`,
-                { source: "RatesHub AI", actions: { from, to, amount } }
+                { actions: { from, to, amount } }
             );
 
             // Update suggestion chips for next steps
             updateSuggestionsAfterQuery(from + " " + to, { from, to, amount });
         } else {
-            appendChatMessage("bot", `Failed to complete conversion: ${data.error}`, { source: "RatesHub AI" });
+            appendChatMessage("bot", `Failed to complete conversion: ${data.error}`);
         }
     } catch (e) {
-        appendChatMessage("bot", "I could not reach the conversion server. Please check backend connection.", { source: "RatesHub AI" });
+        appendChatMessage("bot", "I could not reach the conversion server. Please check backend connection.");
     }
 }
 
