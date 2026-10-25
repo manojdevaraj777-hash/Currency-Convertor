@@ -1,7 +1,7 @@
 :root {
-    --bg-dark: #041421;
-    --card-bg: rgba(4, 22, 38, 0.62);
-    --card-border: rgba(0, 242, 254, 0.3);
+    --bg-dark: #04121d;
+    --card-bg: rgba(4, 20, 34, 0.64);
+    --card-border: rgba(0, 242, 254, 0.28);
     --card-border-hover: rgba(251, 191, 36, 0.6);
     --text-primary: #ffffff;
     --text-secondary: #a5f3fc;
@@ -11,16 +11,12 @@
     --accent-teal: #06b6d4;
     --accent-gold: #fbbf24;
     --accent-amber: #f59e0b;
-    --silver-light: #ffffff;
-    --silver-mid: #e2e8f0;
-    --silver-dark: #94a3b8;
-    --gold-light: #fffbeb;
-    --gold-mid: #e6ca65;
-    --gold-dark: #c69f2e;
+    --gold-accent: #fef08a;
     --accent-gradient: linear-gradient(135deg, #00f2fe 0%, #0284c7 50%, #f59e0b 100%);
-    --glass-glow: 0 20px 50px rgba(0, 8, 16, 0.65);
+    --gold-gradient: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    --glass-glow: 0 20px 50px rgba(0, 6, 14, 0.7);
     --border-glow: 0 0 18px rgba(0, 242, 254, 0.4);
-    --gold-glow: 0 0 18px rgba(251, 191, 36, 0.4);
+    --gold-glow: 0 0 18px rgba(251, 191, 36, 0.45);
 }
 
 * {
@@ -52,9 +48,9 @@ html::-webkit-scrollbar, body::-webkit-scrollbar {
 }
 
 body {
-    background-color: #041421;
+    background-color: #04121d;
     background-image: 
-        radial-gradient(ellipse at 50% 18%, rgba(0, 242, 254, 0.08) 0%, transparent 65%),
+        radial-gradient(ellipse at 50% 16%, rgba(0, 242, 254, 0.08) 0%, transparent 65%),
         linear-gradient(180deg, rgba(3, 16, 26, 0.22) 0%, rgba(3, 14, 23, 0.08) 40%, rgba(2, 9, 16, 0.45) 100%),
         url('bg.jpg');
     background-position: center center;
@@ -70,8 +66,8 @@ body::before,
 body::after {
     content: '';
     position: absolute;
-    width: 45vw;
-    height: 45vw;
+    width: 44vw;
+    height: 44vw;
     border-radius: 50%;
     filter: blur(140px);
     z-index: 0;
@@ -104,18 +100,18 @@ body::after {
 }
 
 /* ----------------------------------------------------
-   Floating Top Navigation Header (Realistic Silver/Gold Icons)
+   Floating Top Navigation Header (Mild Silver & Gold Sheen)
    ---------------------------------------------------- */
 .top-nav-bar {
     position: sticky;
     top: 0;
     z-index: 1000;
     width: 100%;
-    background: rgba(3, 16, 28, 0.58);
+    background: rgba(3, 14, 24, 0.58);
     backdrop-filter: blur(24px) saturate(210%);
     -webkit-backdrop-filter: blur(24px) saturate(210%);
-    border-bottom: 1px solid rgba(0, 242, 254, 0.25);
-    box-shadow: 0 4px 24px rgba(0, 8, 16, 0.4), inset 0 -1px 0 rgba(0, 242, 254, 0.15);
+    border-bottom: 1px solid rgba(226, 202, 101, 0.25);
+    box-shadow: 0 4px 24px rgba(0, 6, 14, 0.45), inset 0 -1px 0 rgba(0, 242, 254, 0.15);
     transition: all 0.3s ease;
     flex-shrink: 0;
 }
@@ -144,7 +140,7 @@ body::after {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    filter: drop-shadow(0 0 12px rgba(0, 242, 254, 0.8));
+    filter: drop-shadow(0 0 10px rgba(226, 202, 101, 0.45));
     animation: logoFloat 4s infinite ease-in-out;
 }
 
@@ -161,7 +157,7 @@ body::after {
 .brand-name {
     font-size: 21px;
     font-weight: 800;
-    background: linear-gradient(135deg, #ffffff 25%, #a5f3fc 65%, #ffd166 100%);
+    background: linear-gradient(135deg, #ffffff 30%, #e2e8f0 65%, #e6ca65 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: -0.3px;
@@ -174,10 +170,10 @@ body::after {
     display: flex;
     align-items: center;
     gap: 4px;
-    background: rgba(2, 14, 26, 0.65);
+    background: rgba(2, 12, 22, 0.65);
     padding: 4px;
     border-radius: 36px;
-    border: 1px solid rgba(0, 242, 254, 0.25);
+    border: 1px solid rgba(226, 202, 101, 0.25);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 4px 16px rgba(0, 0, 0, 0.35);
     backdrop-filter: blur(20px);
 }
@@ -186,7 +182,7 @@ body::after {
     background: transparent;
     border: 1px solid transparent;
     outline: none;
-    color: #cbd5e1;
+    color: #e2e8f0;
     padding: 8px 16px;
     border-radius: 26px;
     cursor: pointer;
@@ -202,27 +198,22 @@ body::after {
 
 .nav-item:hover {
     color: #ffffff;
-    background: rgba(0, 242, 254, 0.2);
-    border-color: rgba(0, 242, 254, 0.4);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(226, 202, 101, 0.35);
     transform: translateY(-1px);
 }
 
 .nav-item.active {
     color: #ffffff;
-    background: linear-gradient(135deg, rgba(0, 242, 254, 0.35), rgba(245, 158, 11, 0.25));
-    border: 1px solid rgba(0, 242, 254, 0.65);
-    box-shadow: 0 3px 16px rgba(0, 242, 254, 0.4);
-}
-
-.nav-item.active .nav-icon {
-    transform: scale(1.1);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(226, 202, 101, 0.2) 100%);
+    border: 1px solid rgba(226, 202, 101, 0.45);
+    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.35), 0 0 14px rgba(226, 202, 101, 0.18);
 }
 
 .nav-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s ease;
 }
 
 .nav-svg-icon {
@@ -246,8 +237,8 @@ body::after {
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    background: rgba(16, 185, 129, 0.2);
-    border: 1px solid rgba(16, 185, 129, 0.45);
+    background: rgba(16, 185, 129, 0.18);
+    border: 1px solid rgba(16, 185, 129, 0.4);
     padding: 6px 14px;
     border-radius: 20px;
     font-size: 11.5px;
@@ -295,7 +286,7 @@ body::after {
     }
 }
 
-/* Header within View */
+/* Header within View (Vibrant Cyan & Gold Accent) */
 .view-header {
     margin-bottom: 16px;
     display: flex;
@@ -307,7 +298,7 @@ body::after {
     font-size: 28px;
     font-weight: 800;
     color: #ffffff;
-    background: linear-gradient(135deg, #ffffff 20%, #a5f3fc 60%, #ffd166 100%);
+    background: linear-gradient(135deg, #ffffff 20%, #e0f2fe 60%, #ffd166 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: -0.5px;
@@ -323,25 +314,25 @@ body::after {
 }
 
 /* ----------------------------------------------------
-   Enhanced Frosted Glass Panels (High Blur & Clear Text)
+   Enhanced Frosted Glass Panels (High Blur, Mild Gold Border)
    ---------------------------------------------------- */
 .panel {
-    background: rgba(4, 22, 38, 0.62);
-    border: 1px solid rgba(0, 242, 254, 0.3);
+    background: rgba(4, 20, 34, 0.64);
+    border: 1px solid rgba(226, 202, 101, 0.28);
     backdrop-filter: blur(28px) saturate(210%);
     -webkit-backdrop-filter: blur(28px) saturate(210%);
     border-radius: 22px;
     padding: 24px 32px;
-    box-shadow: 0 20px 50px rgba(0, 8, 16, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 0 35px rgba(0, 242, 254, 0.1);
+    box-shadow: 0 20px 50px rgba(0, 6, 14, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 35px rgba(226, 202, 101, 0.1);
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .panel:hover {
-    border-color: rgba(0, 242, 254, 0.45);
-    box-shadow: 0 24px 60px rgba(0, 8, 16, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 0 45px rgba(0, 242, 254, 0.16);
+    border-color: rgba(226, 202, 101, 0.45);
+    box-shadow: 0 24px 60px rgba(0, 6, 14, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 0 45px rgba(226, 202, 101, 0.15);
 }
 
-/* Form Styles - Previous Vivid Cyan & High Contrast */
+/* Form Styles (Previous Vibrant Cyan Color Theme for Labels) */
 .input-group {
     margin-bottom: 14px;
 }
@@ -359,7 +350,7 @@ label {
 
 input[type="number"] {
     width: 100%;
-    background: rgba(2, 16, 28, 0.68);
+    background: rgba(2, 14, 24, 0.72);
     border: 1px solid rgba(0, 242, 254, 0.32);
     color: #ffffff;
     padding: 12px 18px;
@@ -373,7 +364,7 @@ input[type="number"] {
 }
 
 input[type="number"]:focus {
-    background: rgba(3, 24, 42, 0.8);
+    background: rgba(3, 20, 36, 0.85);
     border-color: var(--accent-cyan);
     box-shadow: 0 0 18px rgba(0, 242, 254, 0.45), inset 0 2px 4px rgba(0, 0, 0, 0.4);
 }
@@ -385,7 +376,7 @@ input[type="number"]:focus {
 }
 
 .custom-select-trigger {
-    background: rgba(2, 16, 28, 0.68);
+    background: rgba(2, 14, 24, 0.72);
     border: 1px solid rgba(0, 242, 254, 0.32);
     color: #ffffff;
     padding: 12px 18px;
@@ -402,7 +393,7 @@ input[type="number"]:focus {
 }
 
 .custom-select-trigger:hover {
-    background: rgba(3, 24, 42, 0.8);
+    background: rgba(3, 20, 36, 0.85);
     border-color: rgba(0, 242, 254, 0.55);
     box-shadow: 0 0 14px rgba(0, 242, 254, 0.3);
 }
@@ -430,6 +421,8 @@ input[type="number"]:focus {
     object-fit: cover;
     border-radius: 3px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .code-ui {
@@ -445,7 +438,7 @@ input[type="number"]:focus {
     top: calc(100% + 6px);
     left: 0;
     right: 0;
-    background: rgba(2, 16, 28, 0.94);
+    background: rgba(2, 14, 24, 0.95);
     border: 1px solid rgba(0, 242, 254, 0.4);
     backdrop-filter: blur(28px) saturate(220%);
     -webkit-backdrop-filter: blur(28px) saturate(220%);
@@ -543,8 +536,8 @@ input[type="number"]:focus {
 
 /* Swap Button */
 #swap {
-    background: rgba(2, 16, 28, 0.68);
-    border: 1px solid rgba(0, 242, 254, 0.4);
+    background: rgba(2, 14, 24, 0.72);
+    border: 1px solid rgba(226, 202, 101, 0.35);
     color: var(--accent-cyan);
     width: 48px;
     height: 48px;
@@ -556,17 +549,17 @@ input[type="number"]:focus {
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     flex-shrink: 0;
     backdrop-filter: blur(16px);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 #swap:hover {
-    border-color: #00f2fe;
-    transform: rotate(180deg) scale(1.1);
-    box-shadow: 0 0 20px rgba(0, 242, 254, 0.6);
+    border-color: #f3e5ab;
+    transform: rotate(180deg) scale(1.08);
+    box-shadow: 0 0 18px rgba(226, 202, 101, 0.45);
 }
 
 /* ----------------------------------------------------
-   Converter Inline Result Container (Previous High Contrast Cyan)
+   Converter Inline Result Container (Previous Vibrant Theme)
    ---------------------------------------------------- */
 .converter-result-container {
     margin-bottom: 16px;
@@ -646,7 +639,7 @@ input[type="number"]:focus {
     display: none !important;
 }
 
-/* Convert Button (Previous Vibrant Gradient) */
+/* Convert Button (Previous Vibrant Cyan & Gold Gradient) */
 .convert-btn {
     width: 100%;
     padding: 15px 24px;
@@ -688,7 +681,7 @@ footer#source {
 }
 
 /* ----------------------------------------------------
-   Widgets & Comparison Grid
+   Widgets & Comparison Grid (Previous Cyan Accent)
    ---------------------------------------------------- */
 .widget-header {
     display: flex;
@@ -895,7 +888,7 @@ canvas#historicalChart {
 }
 
 /* ----------------------------------------------------
-   AI Assistant Chatbot UI (Crystal Frosted Cyan & Gold)
+   AI Assistant Chatbot UI (Crystal Frosted Theme)
    ---------------------------------------------------- */
 .chat-panel {
     display: flex;
@@ -964,16 +957,15 @@ canvas#historicalChart {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 17px;
     flex-shrink: 0;
     background: rgba(2, 16, 28, 0.75);
-    border: 1px solid rgba(0, 242, 254, 0.4);
+    border: 1px solid rgba(226, 202, 101, 0.35);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .chat-msg.user .msg-avatar {
-    background: linear-gradient(135deg, rgba(0, 242, 254, 0.45), rgba(245, 158, 11, 0.35));
-    border-color: rgba(251, 191, 36, 0.6);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(226, 202, 101, 0.25));
+    border-color: rgba(226, 202, 101, 0.55);
 }
 
 .msg-bubble {
@@ -1122,7 +1114,7 @@ canvas#historicalChart {
 /* Voice Mic Button */
 .chat-icon-btn {
     background: rgba(2, 16, 28, 0.7);
-    border: 1px solid rgba(0, 242, 254, 0.32);
+    border: 1px solid rgba(226, 202, 101, 0.32);
     color: #ffffff;
     width: 42px;
     height: 42px;
@@ -1138,9 +1130,9 @@ canvas#historicalChart {
 }
 
 .chat-icon-btn:hover {
-    background: rgba(0, 242, 254, 0.25);
-    border-color: var(--accent-cyan);
-    box-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
+    background: rgba(226, 202, 101, 0.2);
+    border-color: #f3e5ab;
+    box-shadow: 0 0 12px rgba(226, 202, 101, 0.35);
 }
 
 .chat-icon-btn.recording {
@@ -1163,7 +1155,7 @@ canvas#historicalChart {
 }
 
 .chat-action-btn {
-    background: rgba(0, 242, 254, 0.2);
+    background: rgba(0, 242, 254, 0.16);
     border: 1px solid rgba(0, 242, 254, 0.45);
     color: #a5f3fc;
     padding: 6px 12px;
@@ -1178,11 +1170,11 @@ canvas#historicalChart {
 }
 
 .chat-action-btn:hover {
-    background: linear-gradient(135deg, rgba(0, 242, 254, 0.35), rgba(245, 158, 11, 0.3));
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.3), rgba(245, 158, 11, 0.25));
     border-color: var(--accent-gold);
     color: #ffffff;
     transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(0, 242, 254, 0.35);
+    box-shadow: 0 4px 14px rgba(0, 242, 254, 0.3);
 }
 
 .msg-bubble ul {
