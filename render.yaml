@@ -1,9 +1,16 @@
 services:
   - type: web
     name: currency-converter
-    env: docker
+    runtime: docker
+    plan: free
+    region: oregon
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /
     envVars:
       - key: MONGODB_URI
         sync: false
       - key: GEMINI_API_KEY
         sync: false
+
