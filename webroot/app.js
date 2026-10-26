@@ -1,5 +1,5 @@
 window.onerror = function (message, source, lineno, colno, error) {
-    alert("JS Error: " + message + " at " + lineno + ":" + colno);
+    console.error("RatesHub UI Error:", message, "at", lineno + ":" + colno, error);
     return false;
 };
 
@@ -654,10 +654,6 @@ function appendChatMessage(sender, htmlContent, meta = {}) {
             ${actionsHtml}
         </div>
     `;
-
-    chatThread.appendChild(msg);
-    chatThread.scrollTop = chatThread.scrollHeight;
-}
 
     chatThread.appendChild(msg);
     chatThread.scrollTop = chatThread.scrollHeight;
