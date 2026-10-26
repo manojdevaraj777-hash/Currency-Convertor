@@ -9,5 +9,6 @@ FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 COPY --from=build /app/target/currency-converter-1.0.jar app.jar
 COPY webroot ./webroot
-EXPOSE 8080
+ENV PORT=10000
+EXPOSE 10000 8080
 CMD ["java", "-jar", "app.jar"]

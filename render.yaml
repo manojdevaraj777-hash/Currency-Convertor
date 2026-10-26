@@ -9,6 +9,8 @@ services:
     dockerContext: .
     healthCheckPath: /
     envVars:
+      - key: PORT
+        value: 10000
       - key: MONGODB_URI
         sync: false
       - key: GEMINI_API_KEY
